@@ -1,7 +1,8 @@
-import React from 'react';
-import { useForm } from '@inertiajs/react';
+import React, { useState } from 'react';
+import { useForm, Link } from '@inertiajs/react';
 
 const BookNowForm = () => {
+  const [bookingSuccess, setBookingSuccess] = useState(false);
   const { data, setData, post, processing, reset } = useForm({
     name: '',
     email: '',
@@ -10,12 +11,15 @@ const BookNowForm = () => {
     guests: '',
   });
 
-  const handleSubmit = (e) => {X
+  // Get today's date in YYYY-MM-DD format
+  const today = new Date().toISOString().split('T')[0];
+
+  const handleSubmit = (e) => {
     e.preventDefault();
 
     post('/bookings', {
       onSuccess: () => {
-        alert('Booking successful!');
+        setBookingSuccess(true);
         reset();
       },
       onError: (errors) => {
@@ -25,90 +29,129 @@ const BookNowForm = () => {
     });
   };
 
+  const handleClose = () => {
+    reset();
+    setBookingSuccess(false);
+  };
+
+  if (bookingSuccess) {
+    return (
+      <div className="max-w-lg mx-auto bg-white shadow-lg rounded-lg px-8 pt-6 pb-8 mb-4">
+        <h2 className="text-3xl font-semibold mb-6 text-center text-gray-800">Booking Successful!</h2>
+        <p className="text-center text-gray-600 mb-6">Your booking has been confirmed. Thank you for choosing Capitol Boutique Hotel.</p>
+        <div className="flex flex-col space-y-4">
+          <Link
+            href="/bookings"
+            className="bg-blue-600 hover:bg-blue-800 text-white font-semibold py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full text-center transition duration-300 ease-in-out transform hover:scale-105"
+          >
+            View My Bookings
+          </Link>
+          <button
+            onClick={handleClose}
+            className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400 w-full text-center transition duration-300 ease-in-out transform hover:scale-105"
+          >
+            Make Another Booking
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <form onSubmit={handleSubmit} className="max-w-md mx-auto bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
-      <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">Book Your Stay</h2>
-      <div className="mb-4">
-        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
-          Name
-        </label>
-        <input
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          id="name"
-          type="text"
-          placeholder=""
-          value={data.name}
-          onChange={(e) => setData('name', e.target.value)}
-          required
-        />
-      </div>
-      <div className="mb-4">
-        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
-          Email
-        </label>
-        <input
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          id="email"
-          type="email"
-          placeholder=""
-          value={data.email}
-          onChange={(e) => setData('email', e.target.value)}
-          required
-        />
-      </div>
-      <div className="mb-4 flex space-x-4">
-        <div className="w-1/2">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="checkin">
-            Check-in
-          </label>
-          <input
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            id="checkin"
-            type="date"
-            value={data.checkin}
-            onChange={(e) => setData('checkin', e.target.value)}
-            required
-          />
-        </div>
-        <div className="w-1/2">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="checkout">
-            Check-out
-          </label>
-          <input
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            id="checkout"
-            type="date"
-            value={data.checkout}
-            onChange={(e) => setData('checkout', e.target.value)}
-            required
-          />
-        </div>
-      </div>
-      <div className="mb-6">
-        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="guests">
-          Guests
-        </label>
-        <input
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          id="guests"
-          type="number"
-          placeholder="2"
-          min="1"
-          value={data.guests}
-          onChange={(e) => setData('guests', e.target.value)}
-          required
-        />
-      </div>
-      <div className="flex items-center justify-center">
+    <div className="relative">
+      <form onSubmit={handleSubmit} className="max-w-lg mx-auto bg-white shadow-lg rounded-lg px-8 pt-6 pb-8 mb-4">
         <button
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full transition duration-300 ease-in-out transform hover:scale-105"
-          type="submit"
-          disabled={processing}
+          type="button"
+          className="absolute top-2 right-2 text-gray-600 hover:text-gray-800 text-xl"
+          onClick={handleClose}
         >
-          {processing ? 'Processing...' : 'Book Now'}
+          &times;
         </button>
-      </div>
-    </form>
+        <h2 className="text-3xl font-semibold mb-6 text-center text-gray-800">Book Your Stay at Capitol Boutique Hotel</h2>
+        <div className="mb-4">
+          <label className="block text-gray-700 text-sm font-semibold mb-2" htmlFor="name">
+            Full Name
+          </label>
+          <input
+            className="shadow-sm border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500"
+            id="name"
+            type="text"
+            placeholder="Enter your full name"
+            value={data.name}
+            onChange={(e) => setData('name', e.target.value)}
+            required
+          />
+        </div>
+        <div className="mb-4">
+          <label className="block text-gray-700 text-sm font-semibold mb-2" htmlFor="email">
+            Email Address
+          </label>
+          <input
+            className="shadow-sm border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500"
+            id="email"
+            type="email"
+            placeholder="Enter your email address"
+            value={data.email}
+            onChange={(e) => setData('email', e.target.value)}
+            required
+          />
+        </div>
+        <div className="mb-4 flex space-x-4">
+          <div className="w-1/2">
+            <label className="block text-gray-700 text-sm font-semibold mb-2" htmlFor="checkin">
+              Check-in Date
+            </label>
+            <input
+              className="shadow-sm border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500"
+              id="checkin"
+              type="date"
+              value={data.checkin}
+              onChange={(e) => setData('checkin', e.target.value)}
+              required
+              min={today} // Prevent past dates
+            />
+          </div>
+          <div className="w-1/2">
+            <label className="block text-gray-700 text-sm font-semibold mb-2" htmlFor="checkout">
+              Check-out Date
+            </label>
+            <input
+              className="shadow-sm border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500"
+              id="checkout"
+              type="date"
+              value={data.checkout}
+              onChange={(e) => setData('checkout', e.target.value)}
+              required
+              min={today} // Prevent past dates
+            />
+          </div>
+        </div>
+        <div className="mb-6">
+          <label className="block text-gray-700 text-sm font-semibold mb-2" htmlFor="guests">
+            Number of Guests
+          </label>
+          <input
+            className="shadow-sm border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500"
+            id="guests"
+            type="number"
+            min="1"
+            placeholder="1"
+            value={data.guests}
+            onChange={(e) => setData('guests', e.target.value)}
+            required
+          />
+        </div>
+        <div className="flex items-center justify-center">
+          <button
+            className="bg-blue-600 hover:bg-blue-800 text-white font-semibold py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full transition duration-300 ease-in-out transform hover:scale-105"
+            type="submit"
+            disabled={processing}
+          >
+            {processing ? 'Processing...' : 'Confirm Booking'}
+          </button>
+        </div>
+      </form>
+    </div>
   );
 };
 

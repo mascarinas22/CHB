@@ -82,7 +82,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                     <Dropdown.Link href={route('profile.edit')}>Profile</Dropdown.Link>
                                     <Dropdown.Link href={route('bookings.mybookings')}>My Bookings</Dropdown.Link>
                                     <Dropdown.Link href={route('bookings.history')}>Booking History</Dropdown.Link>
-                                    <Dropdown.Link href={route('payments.index')}>Payments</Dropdown.Link>
+                                    
                                     <Dropdown.Link href={route('logout')} method="post" as="button">
                                         Log Out
                                     </Dropdown.Link>

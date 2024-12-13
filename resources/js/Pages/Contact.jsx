@@ -5,13 +5,12 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const ContactUs = () => {
-  const [name, setName] = useState("");
-  const [message, setMessage] = useState("");
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     message: "",
   });
+  const [sentimentResult, setSentimentResult] = useState("");
 
   // Handle input changes
   const handleChange = (e) => {
@@ -21,35 +20,29 @@ const ContactUs = () => {
     });
   };
 
-  const handleSubmit = async (e) => {
-  e.preventDefault();
+  // Simple sentiment analysis function
+  const analyzeSentiment = (text) => {
+    const positiveWords = ['good', 'great', 'excellent', 'amazing', 'wonderful', 'fantastic', 'happy','satisfied'];
+    const negativeWords = ['bad', 'poor', 'terrible', 'awful', 'horrible', 'sad', 'angry','unsatisfied'];
 
-  try {
-    const response = await fetch("http://127.0.0.1:3000/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ name }),
+    const lowercaseText = text.toLowerCase();
+    const words = lowercaseText.match(/\w+/g) || [];
+
+    let positiveCount = 0;
+    let negativeCount = 0;
+
+    words.forEach(word => {
+      if (positiveWords.includes(word)) positiveCount++;
+      if (negativeWords.includes(word)) negativeCount++;
     });
 
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || "An error occurred.");
-    }
+    if (positiveCount > negativeCount) return "positive";
+    if (negativeCount > positiveCount) return "negative";
+    return "neutral";
+  };
 
-    const result = await response.json();
-    setMessage(result.message); // Display the message from Django
-  } catch (error) {
-    console.error("Error submitting form:", error);
-    setMessage("Failed to fetch message.");
-  }
-};
-
-  
   // Submit the form data
   const contactSubmit = async (e) => {
-//
     e.preventDefault(); // Prevent form reload
 
     try {
@@ -61,6 +54,10 @@ const ContactUs = () => {
       });
 
       console.log(response.data);
+
+      // Analyze sentiment
+      const sentiment = analyzeSentiment(formData.message);
+      setSentimentResult(`Your message appears to be ${sentiment}.`);
 
       // Show a success toast notification
       toast.success("Message submitted successfully!", {
@@ -171,17 +168,9 @@ const ContactUs = () => {
                   rows="4"
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#B59D8F] focus:ring-[#B59D8F]"
                 ></textarea>
-
-            <input
-              type="text"
-              value={name}
-              onChange={handleChange}
-              placeholder="Your Name"
-            />
               </div>
-                       
               <div>
-                <button onClick={handleChange}
+                <button
                   type="submit"
                   className="w-full rounded-md bg-[#B59D8F] px-4 py-2 text-white font-medium shadow-sm hover:bg-[#a3897a] focus:outline-none focus:ring-2 focus:ring-[#B59D8F]"
                 >
@@ -189,7 +178,11 @@ const ContactUs = () => {
                 </button>
               </div>
             </form>
-            <h1>{message}</h1>
+            {sentimentResult && (
+              <div className="mt-4 p-4 bg-white shadow-md rounded-md">
+                <p className="text-gray-700">{sentimentResult}</p>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -198,3 +191,4 @@ const ContactUs = () => {
 };
 
 export default ContactUs;
+

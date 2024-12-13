@@ -5,7 +5,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\ContactController;
-use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\MybookingController;
 use App\Http\Controllers\GreetingsController;
@@ -29,7 +29,7 @@ Route::get('/bookings/mybookings', [MybookingController::class, 'index'])->name(
 
 
 // Payments Route
-Route::get('/payments', [PaymentController::class, 'index'])->name('payments.index');
+Route::get('/Admin', [AdminController::class, 'index'])->name('Admin.index');
 
 
 
